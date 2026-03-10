@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HexNet — An Interactive AI Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&family=Open+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: 'Open Sans', sans-serif;
+      color: #57534e;
+      background: #fff;
+      line-height: 1.7;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-family: 'Crimson Text', serif;
+      font-weight: 600;
+      font-size: 1.5rem !important;
+      color: #1c1917;
+      letter-spacing: -0.01em;
+      line-height: 1.25;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    .text-block {
+      max-width: 700px;
+    }
+
+    /* ── Header ─────────────────────────────────────────── */
+
+    .site-header {
+      border-bottom: 1px solid #e7e5e3;
+      padding: 8px 0;
+    }
+
+    .site-header .container {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+
+    .site-header .logo {
+      font-family: 'Crimson Text', serif;
+      font-weight: 600;
+      font-size: 1.375rem;
+      color: #1c1917;
+      letter-spacing: -0.01em;
+    }
+
+    .site-header .tagline {
+      font-size: 0.8125rem;
+      color: #a8a29e;
+    }
+
+    /* ── Section Label ──────────────────────────────────── */
+
+    .section-label {
+      font-family: 'Open Sans', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #3d8b8b;
+      margin-bottom: 24px;
+    }
+
+    /* ── Hero ────────────────────────────────────────────── */
+
+    .hero {
+      padding: 80px 0 64px;
+    }
+
+    .hero h1 {
+      font-size: 2.25rem;
+      margin-bottom: 16px;
+    }
+
+    .hero .subtitle {
+      font-size: 1.125rem;
+      color: #57534e;
+      line-height: 1.7;
+      max-width: 620px;
+      margin-bottom: 12px;
+    }
+
+    .hero .rule {
+      font-size: 0.875rem;
+      color: #a8a29e;
+    }
+
+    /* ── Game Section ────────────────────────────────────── */
+
+    .game-section {
+      padding: 0 0 80px;
+    }
+
+    .game-layout {
+      display: flex;
+      gap: 56px;
+      align-items: flex-start;
+    }
+
+    .board-container {
+      flex-shrink: 0;
+    }
+
+    .controls-panel {
+      flex: 1;
+      min-width: 0;
+      padding-top: 8px;
+    }
+
+    /* ── Controls ────────────────────────────────────────── */
+
+    .player-label {
+      font-family: 'Open Sans', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #3d8b8b;
+      margin-bottom: 6px;
+    }
+
+    .player-config {
+      margin-bottom: 28px;
+    }
+
+    .player-config select {
+      display: block;
+      width: 100%;
+      max-width: 280px;
+      padding: 8px 12px;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 0.875rem;
+      color: #1c1917;
+      background: #fff;
+      border: 1px solid #d6d3d1;
+      border-radius: 4px;
+      outline: none;
+      cursor: pointer;
+      appearance: auto;
+    }
+
+    .player-config select:focus {
+      border-color: #a8a29e;
+    }
+
+    .turn-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: #1c1917;
+    }
+
+    .turn-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .turn-dot.blue {
+      background: #2563eb;
+    }
+
+    .turn-dot.orange {
+      background: #f97316;
+    }
+
+    .game-result {
+      font-family: 'Crimson Text', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1c1917;
+      margin-bottom: 16px;
+      min-height: 0;
+      padding: 12px 0;
+      letter-spacing: 0.01em;
+    }
+
+    .game-result:empty {
+      display: none;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 24px;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #fff;
+      background: #1c1917;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      letter-spacing: 0.01em;
+      transition: background-color 0.15s;
+    }
+
+    .btn:hover {
+      background: #292524;
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-small {
+      padding: 6px 16px;
+      font-size: 0.8125rem;
+    }
+
+    /* ── Thinking Toggle ─────────────────────────────────── */
+
+    .thinking-toggle {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .thinking-toggle input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+      accent-color: #1c1917;
+      cursor: pointer;
+    }
+
+    .thinking-toggle label {
+      font-family: 'Open Sans', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #a8a29e;
+      cursor: pointer;
+    }
+
+    /* ── Heatmap & stone animations ────────────────────────── */
+
+    .heatmap-overlay {
+      opacity: 0;
+      animation: heatmap-fade-in 150ms ease-out forwards;
+    }
+
+    @keyframes heatmap-fade-in {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes heatmap-pulse {
+      0% {
+        opacity: 0.7;
+      }
+
+      50% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .heatmap-chosen {
+      animation: heatmap-pulse 0.4s ease-out forwards;
+      pointer-events: none;
+    }
+
+    .stone {
+      animation: stone-appear 120ms ease-out forwards;
+    }
+
+    @keyframes stone-appear {
+      from {
+        r: 0;
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* ── Speed Controls ──────────────────────────────────── */
+
+    .speed-controls {
+      margin-top: 32px;
+      padding-top: 28px;
+      border-top: 1px solid #e7e5e3;
+    }
+
+    .speed-controls .section-label {
+      margin-bottom: 12px;
+    }
+
+    .speed-links {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .speed-link {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #a8a29e;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: 'Open Sans', sans-serif;
+      padding: 0;
+      transition: color 0.15s;
+    }
+
+    .speed-link:hover {
+      color: #57534e;
+    }
+
+    .speed-link.active {
+      color: #1c1917;
+    }
+
+    .simulate-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .simulate-controls input[type="number"] {
+      width: 72px;
+      padding: 6px 8px;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 0.8125rem;
+      color: #1c1917;
+      border: 1px solid #d6d3d1;
+      border-radius: 4px;
+      outline: none;
+      text-align: center;
+    }
+
+    .simulate-controls input[type="number"]:focus {
+      border-color: #a8a29e;
+    }
+
+    .simulate-controls label {
+      font-size: 0.8125rem;
+      color: #57534e;
+    }
+
+    /* ── Simulation Results ──────────────────────────────── */
+
+    .sim-results {
+      margin-top: 24px;
+    }
+
+    .sim-results .sim-title {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #1c1917;
+      margin-bottom: 12px;
+    }
+
+    .sim-bar-container {
+      margin-bottom: 8px;
+    }
+
+    .sim-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8125rem;
+      color: #57534e;
+      margin-bottom: 4px;
+    }
+
+    .sim-bar-track {
+      height: 8px;
+      background: #f5f5f4;
+      border-radius: 2px;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .sim-bar-fill-blue {
+      background: #2563eb;
+      height: 100%;
+    }
+
+    .sim-bar-fill-orange {
+      background: #f97316;
+      height: 100%;
+    }
+
+    .sim-detail {
+      font-size: 0.8125rem;
+      color: #a8a29e;
+      margin-top: 8px;
+    }
+
+    /* ── Error Message ───────────────────────────────────── */
+
+    .error-msg {
+      font-size: 0.8125rem;
+      color: #a8a29e;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
+    /* ── How It Works ────────────────────────────────────── */
+
+    .how-section {
+      padding: 80px 0;
+      border-top: 1px solid #e7e5e3;
+    }
+
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 48px;
+      margin-top: 8px;
+    }
+
+    .how-card h3 {
+      font-size: 1.125rem;
+      margin-bottom: 8px;
+    }
+
+    .how-card p {
+      font-size: 0.9375rem;
+      color: #57534e;
+      line-height: 1.65;
+    }
+
+    /* ── Insight ─────────────────────────────────────────── */
+
+    .insight-section {
+      padding: 64px 0;
+      border-top: 1px solid #e7e5e3;
+    }
+
+    .insight-section blockquote {
+      max-width: 700px;
+      margin: 0 auto;
+      text-align: center;
+      font-family: 'Crimson Text', serif;
+      font-style: italic;
+      font-size: 1.25rem;
+      color: #57534e;
+      line-height: 1.7;
+    }
+
+    /* ── Footer ──────────────────────────────────────────── */
+
+    .site-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px 0 20px;
+      border-top: 1px solid #e7e5e3;
+      text-align: center;
+    }
+
+    .site-footer p {
+      font-size: 0.8125rem;
+      color: #a8a29e;
+      line-height: 1.65;
+    }
+
+    /* ── SVG Board ───────────────────────────────────────── */
+
+    .hex-board {
+      display: block;
+    }
+
+    .hex-cell {
+      cursor: default;
+    }
+
+    .hex-cell.legal {
+      cursor: pointer;
+    }
+
+    .hex-cell polygon {
+      transition: fill 0.1s;
+    }
+
+    .hex-cell.legal:hover polygon.hex-bg {
+      fill: #e7e5e3;
+    }
+
+    /* ── Thinking indicator ──────────────────────────────── */
+
+    .thinking-text {
+      font-size: 0.8125rem;
+      color: #a8a29e;
+      font-style: italic;
+      min-height: 20px;
+      margin-bottom: 8px;
+    }
+
+    /* ── Responsive ──────────────────────────────────────── */
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 20px;
+      }
+
+      .hero {
+        padding: 48px 0 40px;
+      }
+
+      .hero h1 {
+        font-size: 1.75rem;
+      }
+
+      .hero .subtitle {
+        font-size: 1rem;
+      }
+
+      .game-layout {
+        flex-direction: column;
+        gap: 32px;
+      }
+
+      .board-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+
+      .board-container svg {
+        max-width: 100%;
+        height: auto;
+      }
+
+      .controls-panel {
+        width: 100%;
+      }
+
+      .player-config select {
+        max-width: 100%;
+      }
+
+      .how-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .insight-section blockquote {
+        font-size: 1.125rem;
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── Header ──────────────────────────────────────────── -->
+  <header class="site-header">
+    <div class="container">
+      <span class="logo">HexNet</span>
+    </div>
+  </header>
+
+  <!-- ── Hero ─────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="container text-block">
+      <h1>Play against HexZero, HexGPT or Random.</h1>
+      <p style="font-size: 0.8125rem; color: #a8a29e;">Tiny play models, based on AlphaZero
+        and GPT architectures, trained on MacBook in 2 hours.
+    </div>
+  </section>
+
+  <!-- ── Game Section ────────────────────────────────────── -->
+  <section class="game-section">
+    <div class="container">
+      <div class="game-layout">
+
+        <!-- Board -->
+        <div class="board-container">
+          <svg id="hex-board" class="hex-board" width="420" height="380" viewBox="0 0 420 380"></svg>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls-panel">
+
+          <div class="player-config">
+            <div class="player-label">Player 1 (Blue, top → bottom)</div>
+            <select id="player1-select">
+              <option value="human" selected>Human</option>
+              <option value="alphazero">HexZero</option>
+              <option value="hexllm">HexGPT</option>
+              <option value="random">Random</option>
+            </select>
+          </div>
+
+          <div class="player-config">
+            <div class="player-label">Player 2 (Orange, left → right)</div>
+            <select id="player2-select">
+              <option value="human">Human</option>
+              <option value="alphazero" selected>HexZero</option>
+              <option value="hexllm">HexGPT</option>
+              <option value="random">Random</option>
+            </select>
+          </div>
+
+          <div class="thinking-text" id="thinking-text"></div>
+
+          <div class="turn-indicator" id="turn-indicator">
+            <span class="turn-dot blue"></span>
+            <span id="turn-text">Blue's turn</span>
+          </div>
+
+          <div class="game-result" id="game-result"></div>
+
+          <button class="btn" id="new-game-btn">New game</button>
+
+          <div class="error-msg" id="error-msg"></div>
+
+          <!-- Thinking Toggle -->
+          <!-- <div class="thinking-toggle">
+            <input type="checkbox" id="show-thinking-toggle" checked>
+            <label for="show-thinking-toggle">Show thinking</label>
+          </div> -->
+
+          <!-- Speed Controls -->
+          <div class="speed-controls" id="speed-controls" style="display: none;">
+            <div class="section-label">Speed</div>
+            <div class="speed-links">
+              <button class="speed-link active" data-speed="realtime">Real-time</button>
+              <button class="speed-link" data-speed="fast">Fast</button>
+              <button class="speed-link" data-speed="instant">Instant</button>
+            </div>
+            <div id="simulate-panel" style="display: none;">
+              <div class="simulate-controls">
+                <label for="num-games">Games:</label>
+                <input type="number" id="num-games" value="100" min="1" max="1000">
+                <button class="btn btn-small" id="run-sim-btn">Run</button>
+              </div>
+              <div class="sim-results" id="sim-results" style="display: none;"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- ── Footer ──────────────────────────────────────────── -->
+  <footer class="site-footer">
+    <div class="container">
+      <p class="rule">How to play HEX? Connect your two edges of the board. First to bridge wins.</p>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // ── Constants ──────────────────────────────────────────
+    const SIZE = 5;
+    const HEX_R = 28;
+    const HEX_W = Math.sqrt(3) * HEX_R;
+    const HEX_H = 2 * HEX_R;
+    const BOARD_OFFSET_X = 72;
+    const BOARD_OFFSET_Y = 48;
+
+    // ── State ──────────────────────────────────────────────
+    let board = [];
+    let currentPlayer = 1;
+    let moveHistory = [];
+    let gameOver = false;
+    let winner = 0;
+    let heatmap = null;
+    let isThinking = false;
+    let lastMove = null;
+    let speed = 'realtime';
+    let showThinking = true;
+
+    // ── DOM refs ───────────────────────────────────────────
+    const svgEl = document.getElementById('hex-board');
+    const p1Select = document.getElementById('player1-select');
+    const p2Select = document.getElementById('player2-select');
+    const turnIndicator = document.getElementById('turn-indicator');
+    const turnText = document.getElementById('turn-text');
+    const gameResult = document.getElementById('game-result');
+    const newGameBtn = document.getElementById('new-game-btn');
+    const errorMsg = document.getElementById('error-msg');
+    const thinkingText = document.getElementById('thinking-text');
+    const speedControls = document.getElementById('speed-controls');
+    const simulatePanel = document.getElementById('simulate-panel');
+    const simResults = document.getElementById('sim-results');
+    const runSimBtn = document.getElementById('run-sim-btn');
+    const numGamesInput = document.getElementById('num-games');
+    const showThinkingToggle = document.getElementById('show-thinking-toggle') || true;
+
+    // ── Hex Geometry ───────────────────────────────────────
+    function hexCenter(row, col) {
+      const cx = BOARD_OFFSET_X + col * HEX_W + row * HEX_W / 2;
+      const cy = BOARD_OFFSET_Y + row * 1.5 * HEX_R;
+      return { cx, cy };
+    }
+
+    function hexPoints(cx, cy) {
+      const pts = [];
+      for (let i = 0; i < 6; i++) {
+        const angle = (Math.PI / 180) * (60 * i - 30);
+        pts.push({
+          x: cx + HEX_R * Math.cos(angle),
+          y: cy + HEX_R * Math.sin(angle)
+        });
+      }
+      return pts.map(p => `${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(' ');
+    }
+
+    // ── Board SVG ──────────────────────────────────────────
+    function buildBoard() {
+      svgEl.innerHTML = '';
+
+      // Compute SVG dimensions
+      const lastRow = SIZE - 1;
+      const lastCol = SIZE - 1;
+      const { cx: maxCx, cy: maxCy } = hexCenter(lastRow, lastCol);
+      const svgWidth = maxCx + HEX_R + 40;
+      const svgHeight = maxCy + HEX_R + 40;
+      svgEl.setAttribute('width', Math.max(420, svgWidth));
+      svgEl.setAttribute('height', Math.max(380, svgHeight));
+      svgEl.setAttribute('viewBox', `0 0 ${Math.max(420, svgWidth)} ${Math.max(380, svgHeight)}`);
+
+      // Draw edge indicators
+      drawEdgeIndicators();
+
+      // Draw cells
+      for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+          const { cx, cy } = hexCenter(r, c);
+          const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          g.classList.add('hex-cell');
+          g.dataset.row = r;
+          g.dataset.col = c;
+
+          // Background polygon
+          const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+          poly.setAttribute('points', hexPoints(cx, cy));
+          poly.setAttribute('fill', '#ffffff');
+          poly.setAttribute('stroke', '#d6d3d1');
+          poly.setAttribute('stroke-width', '1.5');
+          poly.classList.add('hex-bg');
+          g.appendChild(poly);
+
+          g.addEventListener('click', () => onCellClick(r, c));
+          svgEl.appendChild(g);
+        }
+      }
+
+      // Coordinate labels
+      drawCoordinateLabels();
+    }
+
+    function drawEdgeIndicators() {
+      // Blue edges: top and bottom
+      // Top edge: line above row 0
+      for (let c = 0; c < SIZE; c++) {
+        const { cx, cy } = hexCenter(0, c);
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        const pts = [];
+        for (let i = 0; i < 6; i++) {
+          const angle = (Math.PI / 180) * (60 * i - 30);
+          pts.push({
+            x: cx + HEX_R * Math.cos(angle),
+            y: cy + HEX_R * Math.sin(angle)
+          });
+        }
+        // Top edge of hex: vertices 5 -> 0
+        line.setAttribute('x1', pts[5].x.toFixed(2));
+        line.setAttribute('y1', pts[5].y.toFixed(2));
+        line.setAttribute('x2', pts[0].x.toFixed(2));
+        line.setAttribute('y2', pts[0].y.toFixed(2));
+        line.setAttribute('stroke', '#2563eb');
+        line.setAttribute('stroke-width', '3');
+        line.setAttribute('stroke-linecap', 'round');
+        svgEl.appendChild(line);
+      }
+
+      // Bottom edge: line below row SIZE-1
+      for (let c = 0; c < SIZE; c++) {
+        const { cx, cy } = hexCenter(SIZE - 1, c);
+        const pts = [];
+        for (let i = 0; i < 6; i++) {
+          const angle = (Math.PI / 180) * (60 * i - 30);
+          pts.push({
+            x: cx + HEX_R * Math.cos(angle),
+            y: cy + HEX_R * Math.sin(angle)
+          });
+        }
+        // Bottom edge: vertices 2 -> 3
+        line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line1.setAttribute('x1', pts[2].x.toFixed(2));
+        line1.setAttribute('y1', pts[2].y.toFixed(2));
+        line1.setAttribute('x2', pts[3].x.toFixed(2));
+        line1.setAttribute('y2', pts[3].y.toFixed(2));
+        line1.setAttribute('stroke', '#2563eb');
+        line1.setAttribute('stroke-width', '3');
+        line1.setAttribute('stroke-linecap', 'round');
+        svgEl.appendChild(line1);
+      }
+
+      // Orange edges: left and right
+      // Left edge: leftmost col of each row
+      for (let r = 0; r < SIZE; r++) {
+        const { cx, cy } = hexCenter(r, 0);
+        const pts = [];
+        for (let i = 0; i < 6; i++) {
+          const angle = (Math.PI / 180) * (60 * i - 30);
+          pts.push({
+            x: cx + HEX_R * Math.cos(angle),
+            y: cy + HEX_R * Math.sin(angle)
+          });
+        }
+        // Left edge: vertices 4 -> 5 (upper-left) and 3 -> 4 (lower-left)
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', pts[3].x.toFixed(2));
+        line.setAttribute('y1', pts[3].y.toFixed(2));
+        line.setAttribute('x2', pts[4].x.toFixed(2));
+        line.setAttribute('y2', pts[4].y.toFixed(2));
+        line.setAttribute('stroke', '#f97316');
+        line.setAttribute('stroke-width', '3');
+        line.setAttribute('stroke-linecap', 'round');
+        svgEl.appendChild(line);
+
+        const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line2.setAttribute('x1', pts[4].x.toFixed(2));
+        line2.setAttribute('y1', pts[4].y.toFixed(2));
+        line2.setAttribute('x2', pts[5].x.toFixed(2));
+        line2.setAttribute('y2', pts[5].y.toFixed(2));
+        line2.setAttribute('stroke', '#f97316');
+        line2.setAttribute('stroke-width', '3');
+        line2.setAttribute('stroke-linecap', 'round');
+        svgEl.appendChild(line2);
+      }
+
+      // Right edge: rightmost col of each row
+      for (let r = 0; r < SIZE; r++) {
+        const { cx, cy } = hexCenter(r, SIZE - 1);
+        const pts = [];
+        for (let i = 0; i < 6; i++) {
+          const angle = (Math.PI / 180) * (60 * i - 30);
+          pts.push({
+            x: cx + HEX_R * Math.cos(angle),
+            y: cy + HEX_R * Math.sin(angle)
+          });
+        }
+        // Right edge: vertices 0 -> 1 and 1 -> 2
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', pts[0].x.toFixed(2));
+        line.setAttribute('y1', pts[0].y.toFixed(2));
+        line.setAttribute('x2', pts[1].x.toFixed(2));
+        line.setAttribute('y2', pts[1].y.toFixed(2));
+        line.setAttribute('stroke', '#f97316');
+        line.setAttribute('stroke-width', '3');
+        line.setAttribute('stroke-linecap', 'round');
+        svgEl.appendChild(line);
+
+        const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line2.setAttribute('x1', pts[1].x.toFixed(2));
+        line2.setAttribute('y1', pts[1].y.toFixed(2));
+        line2.setAttribute('x2', pts[2].x.toFixed(2));
+        line2.setAttribute('y2', pts[2].y.toFixed(2));
+        line2.setAttribute('stroke', '#f97316');
+        line2.setAttribute('stroke-width', '3');
+        line2.setAttribute('stroke-linecap', 'round');
+        svgEl.appendChild(line2);
+      }
+    }
+
+    function drawCoordinateLabels() {
+      // Column labels along top
+      for (let c = 0; c < SIZE; c++) {
+        const { cx, cy } = hexCenter(0, c);
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', cx);
+        text.setAttribute('y', cy - HEX_R - 8);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('font-family', 'Open Sans, sans-serif');
+        text.setAttribute('font-size', '10');
+        text.setAttribute('fill', '#a8a29e');
+        text.textContent = String.fromCharCode(65 + c); // A, B, C, D, E
+        svgEl.appendChild(text);
+      }
+
+      // Row labels along left
+      for (let r = 0; r < SIZE; r++) {
+        const { cx, cy } = hexCenter(r, 0);
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', cx - HEX_R - 12);
+        text.setAttribute('y', cy + 4);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('font-family', 'Open Sans, sans-serif');
+        text.setAttribute('font-size', '10');
+        text.setAttribute('fill', '#a8a29e');
+        text.textContent = r + 1;
+        svgEl.appendChild(text);
+      }
+    }
+
+    // ── Render Board State ─────────────────────────────────
+    function renderBoard() {
+      const cells = svgEl.querySelectorAll('.hex-cell');
+      cells.forEach(g => {
+        const r = parseInt(g.dataset.row);
+        const c = parseInt(g.dataset.col);
+        const poly = g.querySelector('.hex-bg');
+        const { cx, cy } = hexCenter(r, c);
+
+        // Remove old stones and overlays
+        g.querySelectorAll('.stone, .heatmap-overlay, .last-move-marker').forEach(el => el.remove());
+
+        const val = board[r][c];
+
+        if (val === 0) {
+          poly.setAttribute('fill', '#ffffff');
+          // Legal move — allow hover if it's a human turn and game not over
+          const currentType = currentPlayer === 1 ? p1Select.value : p2Select.value;
+          if (!gameOver && !isThinking && currentType === 'human') {
+            g.classList.add('legal');
+          } else {
+            g.classList.remove('legal');
+          }
+        } else {
+          g.classList.remove('legal');
+          const color = val === 1 ? '#2563eb' : '#f97316';
+          poly.setAttribute('fill', color);
+
+          // Draw stone circle on top for visual clarity
+          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('cx', cx);
+          circle.setAttribute('cy', cy);
+          circle.setAttribute('r', HEX_R * 0.55);
+          circle.setAttribute('fill', color);
+          circle.classList.add('stone');
+          g.appendChild(circle);
+        }
+
+        // Heatmap overlay
+        if (heatmap && val === 0) {
+          const heat = heatmap[r * SIZE + c];
+          const maxHeat = Math.max(...heatmap);
+          if (heat > 0.02 && maxHeat > 0) {
+            const overlay = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            overlay.setAttribute('points', hexPoints(cx, cy));
+            // Normalize to max value, steep power curve for high contrast
+            const normalized = heat / maxHeat;
+            const opacity = 0.04 + Math.pow(normalized, 2.5) * 0.61;
+            const heatColor = currentPlayer === 1 ? `rgba(37, 99, 235, ${opacity.toFixed(3)})` : `rgba(249, 115, 22, ${opacity.toFixed(3)})`;
+            overlay.setAttribute('fill', heatColor);
+            overlay.setAttribute('stroke', 'none');
+            overlay.classList.add('heatmap-overlay');
+            overlay.style.pointerEvents = 'none';
+            g.appendChild(overlay);
+          }
+        }
+
+        // Last move marker
+        if (lastMove && lastMove.row === r && lastMove.col === c) {
+          const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          marker.setAttribute('cx', cx);
+          marker.setAttribute('cy', cy);
+          marker.setAttribute('r', 5);
+          marker.setAttribute('fill', 'none');
+          marker.setAttribute('stroke', '#ffffff');
+          marker.setAttribute('stroke-width', '2');
+          marker.classList.add('last-move-marker');
+          marker.style.pointerEvents = 'none';
+          g.appendChild(marker);
+        }
+      });
+    }
+
+    // ── Game Logic ─────────────────────────────────────────
+    function getLegalMoves(b) {
+      const moves = [];
+      for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+          if (b[r][c] === 0) moves.push({ row: r, col: c });
+        }
+      }
+      return moves;
+    }
+
+    function makeMove(b, row, col, player) {
+      b[row][col] = player;
+    }
+
+    function getNeighbors(r, c) {
+      const dirs = [[-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0]];
+      const neighbors = [];
+      for (const [dr, dc] of dirs) {
+        const nr = r + dr;
+        const nc = c + dc;
+        if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
+          neighbors.push({ row: nr, col: nc });
+        }
+      }
+      return neighbors;
+    }
+
+    function checkWinner(b) {
+      // Player 1: top to bottom (rows 0 to SIZE-1)
+      const visited1 = Array.from({ length: SIZE }, () => Array(SIZE).fill(false));
+      const queue1 = [];
+      for (let c = 0; c < SIZE; c++) {
+        if (b[0][c] === 1) {
+          queue1.push({ row: 0, col: c });
+          visited1[0][c] = true;
+        }
+      }
+      while (queue1.length > 0) {
+        const { row, col } = queue1.shift();
+        if (row === SIZE - 1) return 1;
+        for (const n of getNeighbors(row, col)) {
+          if (!visited1[n.row][n.col] && b[n.row][n.col] === 1) {
+            visited1[n.row][n.col] = true;
+            queue1.push(n);
+          }
+        }
+      }
+
+      // Player -1: left to right (cols 0 to SIZE-1)
+      const visited2 = Array.from({ length: SIZE }, () => Array(SIZE).fill(false));
+      const queue2 = [];
+      for (let r = 0; r < SIZE; r++) {
+        if (b[r][0] === -1) {
+          queue2.push({ row: r, col: 0 });
+          visited2[r][0] = true;
+        }
+      }
+      while (queue2.length > 0) {
+        const { row, col } = queue2.shift();
+        if (col === SIZE - 1) return -1;
+        for (const n of getNeighbors(row, col)) {
+          if (!visited2[n.row][n.col] && b[n.row][n.col] === -1) {
+            visited2[n.row][n.col] = true;
+            queue2.push(n);
+          }
+        }
+      }
+
+      return 0;
+    }
+
+    // ── API Calls ──────────────────────────────────────────
+    async function getAIMove(agent) {
+      const response = await fetch('/api/move', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          board: board,
+          player: currentPlayer,
+          agent: agent,
+          move_history: moveHistory.map(m => m.row * SIZE + m.col),
+          simulations: 100
+        })
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.json();
+    }
+
+    async function simulateGames(agent1, agent2, numGames) {
+      const response = await fetch('/api/simulate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agent1: agent1,
+          agent2: agent2,
+          num_games: numGames,
+          simulations: 50
+        })
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.json();
+    }
+
+    // ── Random move (client-side fallback) ─────────────────
+    function getRandomMove(b) {
+      const legal = getLegalMoves(b);
+      if (legal.length === 0) return null;
+      return legal[Math.floor(Math.random() * legal.length)];
+    }
+
+    // ── Game Flow ──────────────────────────────────────────
+    function resetGame() {
+      board = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
+      currentPlayer = 1;
+      moveHistory = [];
+      gameOver = false;
+      winner = 0;
+      heatmap = null;
+      lastMove = null;
+      isThinking = false;
+      errorMsg.textContent = '';
+      gameResult.textContent = '';
+      thinkingText.textContent = '';
+      simResults.style.display = 'none';
+      updateTurnIndicator();
+      updateSpeedVisibility();
+      buildBoard();
+      renderBoard();
+
+      // Kick off AI if first player is AI
+      scheduleAIMove();
+    }
+
+    function updateTurnIndicator() {
+      if (gameOver) {
+        turnIndicator.style.display = 'none';
+        return;
+      }
+      turnIndicator.style.display = 'flex';
+      const dot = turnIndicator.querySelector('.turn-dot');
+      if (currentPlayer === 1) {
+        dot.className = 'turn-dot blue';
+        turnText.textContent = "Blue's turn";
+      } else {
+        dot.className = 'turn-dot orange';
+        turnText.textContent = "Orange's turn";
+      }
+    }
+
+    function getCurrentPlayerType() {
+      return currentPlayer === 1 ? p1Select.value : p2Select.value;
+    }
+
+    function getAgentName(type) {
+      const names = { human: 'Human', alphazero: 'AlphaZero', hexllm: 'HexLLM', random: 'Random' };
+      return names[type] || type;
+    }
+
+    function showResult() {
+      gameOver = true;
+      updateTurnIndicator();
+      if (winner === 1) {
+        gameResult.textContent = 'Blue wins';
+        gameResult.style.color = '#2563eb';
+      } else if (winner === -1) {
+        gameResult.textContent = 'Orange wins';
+        gameResult.style.color = '#f97316';
+      } else {
+        gameResult.textContent = 'Draw';
+        gameResult.style.color = '#1c1917';
+      }
+      renderBoard();
+    }
+
+    function onCellClick(row, col) {
+      if (gameOver || isThinking) return;
+      if (getCurrentPlayerType() !== 'human') return;
+      if (board[row][col] !== 0) return;
+
+      placeStone(row, col);
+    }
+
+    function placeStone(row, col) {
+      makeMove(board, row, col, currentPlayer);
+      moveHistory.push({ row, col, player: currentPlayer });
+      lastMove = { row, col };
+      heatmap = null;
+
+      winner = checkWinner(board);
+      if (winner !== 0) {
+        showResult();
+        return;
+      }
+
+      // Check if board is full (shouldn't happen in Hex without a winner, but safety)
+      if (getLegalMoves(board).length === 0) {
+        showResult();
+        return;
+      }
+
+      currentPlayer = currentPlayer === 1 ? -1 : 1;
+      updateTurnIndicator();
+      renderBoard();
+
+      // Schedule next AI move
+      scheduleAIMove();
+    }
+
+    function scheduleAIMove() {
+      if (gameOver) return;
+      const type = getCurrentPlayerType();
+      if (type !== 'human') {
+        requestAnimationFrame(() => doAIMove(type));
+      }
+    }
+
+    async function doAIMove(agentType) {
+      if (gameOver || isThinking) return;
+      isThinking = true;
+      thinkingText.textContent = `${getAgentName(agentType)} is thinking...`;
+      renderBoard();
+      errorMsg.textContent = '';
+
+      try {
+        const result = await getAIMove(agentType);
+        if (gameOver) { isThinking = false; thinkingText.textContent = ''; return; }
+
+        const row = result.row;
+        const col = result.col;
+
+        if (showThinking && result.heatmap) {
+          // Show heatmap, then pulse the chosen cell
+          heatmap = result.heatmap;
+          renderBoard();
+          if (speed === 'realtime') {
+            await delay(1000);
+          } else if (speed === 'fast') {
+            await delay(300);
+          }
+          // Pulse the chosen cell before placing
+          heatmap = null;
+          renderBoard();
+          const chosenCell = svgEl.querySelector(`.hex-cell[data-row="${row}"][data-col="${col}"]`);
+          if (chosenCell) {
+            const { cx: pcx, cy: pcy } = hexCenter(row, col);
+            const pulse = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pulse.setAttribute('cx', pcx);
+            pulse.setAttribute('cy', pcy);
+            pulse.setAttribute('r', HEX_R * 0.7);
+            const pulseColor = currentPlayer === 1 ? 'rgba(37, 99, 235, 0.7)' : 'rgba(249, 115, 22, 0.7)';
+            pulse.setAttribute('fill', pulseColor);
+            pulse.classList.add('heatmap-chosen');
+            chosenCell.appendChild(pulse);
+            await delay(400);
+            pulse.remove();
+          }
+        } else if (!showThinking) {
+          // No heatmap: minimal or no delay
+          if (speed === 'fast') {
+            await delay(100);
+          }
+          // realtime with showThinking off: no delay
+        } else if (speed === 'fast') {
+          await delay(100);
+        }
+
+        if (gameOver) { isThinking = false; thinkingText.textContent = ''; return; }
+
+        isThinking = false;
+        thinkingText.textContent = '';
+        placeStone(row, col);
+      } catch (err) {
+        isThinking = false;
+        thinkingText.textContent = '';
+
+        // If it's random, do it client-side as fallback
+        if (agentType === 'random') {
+          const move = getRandomMove(board);
+          if (move) {
+            if (speed === 'realtime') await delay(500);
+            else if (speed === 'fast') await delay(100);
+            placeStone(move.row, move.col);
+          }
+        } else {
+          errorMsg.textContent = 'Could not reach the AI engine. Is server.py running?';
+          // If both are AI and one fails, don't block forever
+          renderBoard();
+        }
+      }
+    }
+
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // ── Speed Controls ─────────────────────────────────────
+    function updateSpeedVisibility() {
+      const p1 = p1Select.value;
+      const p2 = p2Select.value;
+      const bothAI = p1 !== 'human' && p2 !== 'human';
+      speedControls.style.display = bothAI ? 'block' : 'none';
+      simulatePanel.style.display = speed === 'instant' ? 'block' : 'none';
+    }
+
+    document.querySelectorAll('.speed-link').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.speed-link').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        speed = btn.dataset.speed;
+        simulatePanel.style.display = speed === 'instant' ? 'block' : 'none';
+      });
+    });
+
+    // showThinkingToggle.addEventListener('change', () => {
+    //   showThinking = showThinkingToggle.checked;
+    // });
+
+    // ── Simulation ─────────────────────────────────────────
+    runSimBtn.addEventListener('click', async () => {
+      const agent1 = p1Select.value;
+      const agent2 = p2Select.value;
+      const numGames = parseInt(numGamesInput.value) || 100;
+
+      runSimBtn.disabled = true;
+      runSimBtn.textContent = 'Running...';
+      simResults.style.display = 'none';
+      errorMsg.textContent = '';
+
+      try {
+        const result = await simulateGames(agent1, agent2, numGames);
+        const total = result.agent1_wins + result.agent2_wins;
+        const p1Pct = total > 0 ? ((result.agent1_wins / total) * 100).toFixed(1) : '0';
+        const p2Pct = total > 0 ? ((result.agent2_wins / total) * 100).toFixed(1) : '0';
+
+        simResults.innerHTML = `
+      <div class="sim-title">${total} games completed</div>
+      <div class="sim-bar-container">
+        <div class="sim-bar-label">
+          <span>${getAgentName(agent1)} (Blue): ${p1Pct}%</span>
+          <span>${getAgentName(agent2)} (Orange): ${p2Pct}%</span>
+        </div>
+        <div class="sim-bar-track">
+          <div class="sim-bar-fill-blue" style="width: ${p1Pct}%"></div>
+          <div class="sim-bar-fill-orange" style="width: ${p2Pct}%"></div>
+        </div>
+      </div>
+      <div class="sim-detail">Average game length: ${result.avg_game_length ? result.avg_game_length.toFixed(1) : '—'} moves</div>
+    `;
+        simResults.style.display = 'block';
+      } catch (err) {
+        errorMsg.textContent = 'Could not reach the AI engine. Is server.py running?';
+      }
+
+      runSimBtn.disabled = false;
+      runSimBtn.textContent = 'Run';
+    });
+
+    // ── Event Listeners ────────────────────────────────────
+    newGameBtn.addEventListener('click', resetGame);
+
+    p1Select.addEventListener('change', () => {
+      updateSpeedVisibility();
+      resetGame();
+    });
+
+    p2Select.addEventListener('change', () => {
+      updateSpeedVisibility();
+      resetGame();
+    });
+
+    // ── Init ───────────────────────────────────────────────
+    resetGame();
+  </script>
+
+</body>
+
+</html>

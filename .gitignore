@@ -1,0 +1,17 @@
+# Python artifacts
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Checkpoints (Ignore intermediate training checkpoints)
+checkpoints/model_iter_*.pt
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
